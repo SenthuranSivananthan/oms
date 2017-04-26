@@ -13,7 +13,7 @@ $ResourceGroupList = Get-AzureRmResourceGroup -Verbose
 
 foreach ($ResourceGroupName in $ResourceGroupList.ResourceGroupName)
 {
-    Write-Host("Checking " + $ResourceGroupName)
+    Write-Output("Checking " + $ResourceGroupName)
 
     $VMList = Get-AzureRmVM -ResourceGroupName $ResourceGroupName -WarningAction SilentlyContinue -Verbose
 
@@ -86,14 +86,14 @@ foreach ($ResourceGroupName in $ResourceGroupList.ResourceGroupName)
     }
 }
 
-Write-Host("*****************************")
+Write-Output("*****************************")
 
 if ($DryRun -eq $true)
 {
-    Write-Host("This script was executed in Dry Run mode.  OMS Extension was not installed.")
+    Write-Output("This script was executed in Dry Run mode.  OMS Extension was not installed.")
 }
 
-Write-Host("VMs with OMS Agent: " + $OMSExistingInstalledCount + " server(s)")
-Write-Host("OMS (Windows Agent) newly installed: " + $OMSNewInstallWindowsCount + " server(s)")
-Write-Host("OMS (Linux Agent) newly installed: " + $OMSNewInstallLinuxCount + " server(s)")
-Write-Host("OMS agent not installed due to Power Off: " + $OMSNewInstallVMOffCount + " server(s)")
+Write-Output("VMs with OMS Agent: " + $OMSExistingInstalledCount + " server(s)")
+Write-Output("OMS (Windows Agent) - new: " + $OMSNewInstallWindowsCount + " server(s)")
+Write-Output("OMS (Linux Agent) - new: " + $OMSNewInstallLinuxCount + " server(s)")
+Write-Output("OMS agent not installed due to Power Off: " + $OMSNewInstallVMOffCount + " server(s)")
