@@ -97,22 +97,22 @@
                         }
                     }
                 }
+            }
 
-                if ($OMSNewInstallCount -gt 0)
+            if ($OMSNewInstallCount -gt 0)
+            {
+                if ($DryRun -eq $true)
                 {
-                    if ($DryRun -eq $true)
-                    {
-                        Write-Output("Status for " + $ResourceGroupName + ": OMS Extension needed on " + $OMSNewInstallCount + " VM(s)")
-                    }
-                    else
-                    {
-                        Write-Output("Status for " + $ResourceGroupName + ": OMS Extension installed on " + $OMSNewInstallCount + " VM(s)")
-                    }
+                    Write-Output("Status for " + $ResourceGroupName + ": OMS Extension needed on " + $OMSNewInstallCount + " VM(s)")
                 }
                 else
                 {
-                    Write-Output("Status for " + $ResourceGroupName + ": No changes")
+                    Write-Output("Status for " + $ResourceGroupName + ": OMS Extension installed on " + $OMSNewInstallCount + " VM(s)")
                 }
+            }
+            else
+            {
+                Write-Output("Status for " + $ResourceGroupName + ": No changes")
             }
         }
     }
