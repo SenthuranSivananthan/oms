@@ -19,8 +19,6 @@
     $Settings = @{"workspaceId"=$OMSWorkspaceId};
     $ProtectedSettings = @{"workspaceKey"=$OMSWorkspaceKey};
 
-    $DryRun = $true
-
     if ($DryRun -eq $true)
     {
         Write-Output("This script was executed in Dry Run mode.  OMS Extension will not be installed.")
