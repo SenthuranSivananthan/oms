@@ -30,6 +30,9 @@
         InlineScript 
         {
             $ResourceGroupName = $Using:ResourceGroupName
+            $Settings = $Using:Settings
+            $ProtectedSettings = $Using:ProtectedSettings
+
             $DryRun = $Using:DryRun
 
             $OMSNewInstallCount = 0
