@@ -6,6 +6,9 @@ $OMSNewInstallWindowsCount = 0
 $OMSNewInstallLinuxCount = 0
 $OMSNewInstallVMOffCount = 0
 
+# Set to false when you want to actually install the OMS Extension
+$DryRun = $true
+
 $ResourceGroupList = Get-AzureRmResourceGroup -Verbose
 
 foreach ($ResourceGroupName in $ResourceGroupList.ResourceGroupName)
@@ -30,37 +33,43 @@ foreach ($ResourceGroupName in $ResourceGroupList.ResourceGroupName)
             if ($VMPowerState -eq "VM running")
             {
                 if ($VM.StorageProfile.OsDisk.OsType -eq "Windows"){
-                    "Installing OMS agent on Windows Server: " + $VM.Name
+                    if ($DryRun -eq $false)
+                    {
+                        "Installing OMS agent on Windows Server: " + $VM.Name
 
-                    Set-AzureRmVMExtension `
-                            -ExtensionType MicrosoftMonitoringAgent `
-                            -Name MicrosoftMonitoringAgent `
-                            -Publisher Microsoft.EnterpriseCloud.Monitoring `
-                            -ResourceGroupName $ResourceGroupName `
-                            -TypeHandlerVersion 1.0 `
-                            -VMName $VM.Name `
-                            -Location $VM.Location `
-                            -ProtectedSettings $ProtectedSettings `
-                            -Settings $Settings `
-                            -Verbose
+                        Set-AzureRmVMExtension `
+                                -ExtensionType MicrosoftMonitoringAgent `
+                                -Name MicrosoftMonitoringAgent `
+                                -Publisher Microsoft.EnterpriseCloud.Monitoring `
+                                -ResourceGroupName $ResourceGroupName `
+                                -TypeHandlerVersion 1.0 `
+                                -VMName $VM.Name `
+                                -Location $VM.Location `
+                                -ProtectedSettings $ProtectedSettings `
+                                -Settings $Settings `
+                                -Verbose
+                    }
 
                     $OMSNewInstallWindowsCount++
                 }
                 else
                 {
-                    "Installing OMS agent on Linux Server: " + $VM.Name
+                    if ($DryRun -eq $false)
+                    {
+                        "Installing OMS agent on Linux Server: " + $VM.Name
 
-                    Set-AzureRmVMExtension `
-                            -ExtensionType OmsAgentForLinux `
-                            -Name OmsAgentForLinux `
-                            -Publisher Microsoft.EnterpriseCloud.Monitoring `
-                            -ResourceGroupName $ResourceGroupName `
-                            -TypeHandlerVersion 1.0 `
-                            -VMName $VM.Name `
-                            -Location $VM.Location `
-                            -ProtectedSettings $ProtectedSettings `
-                            -Settings $Settings `
-                            -Verbose
+                        Set-AzureRmVMExtension `
+                                -ExtensionType OmsAgentForLinux `
+                                -Name OmsAgentForLinux `
+                                -Publisher Microsoft.EnterpriseCloud.Monitoring `
+                                -ResourceGroupName $ResourceGroupName `
+                                -TypeHandlerVersion 1.0 `
+                                -VMName $VM.Name `
+                                -Location $VM.Location `
+                                -ProtectedSettings $ProtectedSettings `
+                                -Settings $Settings `
+                                -Verbose
+                    }
 
                     $OMSNewInstallLinuxCount++
                 }
@@ -75,6 +84,13 @@ foreach ($ResourceGroupName in $ResourceGroupList.ResourceGroupName)
             $OMSExistingInstalledCount++
         }
     }
+}
+
+Write-Host("*****************************")
+
+if ($DryRun -eq $true)
+{
+    Write-Host("This script was executed in Dry Run mode.  OMS Extension was not installed.")
 }
 
 Write-Host("VMs with OMS Agent: " + $OMSExistingInstalledCount + " server(s)")
