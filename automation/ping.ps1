@@ -18,14 +18,14 @@
             $PingAlertFrom = Get-AutomationVariable -Name 'PingAlertFrom'
             $PingAlertTo = Get-AutomationVariable -Name 'PingAlertTo'
 
-            $Subject = "VM Status [" + $VMName + "] - " + $Status
+            $Subject = "VM Status: " + $VMName + " - " + $Status
 
             $EmailCredentials = New-Object System.Management.Automation.PSCredential(
                                         $SMTPUsername,
                                         (ConvertTo-SecureString -String $SMTPPassword -AsPlainText -Force)
                                 )
 
-            Write-OUtput("Sending email to " + $PingAlertTo)
+            Write-Output("Sending email to " + $PingAlertTo)
 
 
             Send-MailMessage `
@@ -56,7 +56,7 @@
             if ($PingResponse -eq $null)
             {
                  Write-Output($ComputerDescription.Computer + ": No response")
-                 SendEmail($ComputerDescription.Computer, "No Response")
+                 SendEmail $ComputerDescription.Computer "No Response"
             }
             else
             {
@@ -65,12 +65,12 @@
                 if ($PingResponse.status -eq "Success")
                 {
                     Write-Output($ComputerDescription.Computer + ": Reachable by Ping.")
-                    SendEmail($ComputerDescription.Computer, "Reachable by Ping")
+                    SendEmail $ComputerDescription.Computer "Reachable by Ping"
                 }
                 else
                 {
                     Write-Output($ComputerDescription.Computer + ": Unreachable by Ping.")
-                    SendEmail($ComputerDescription.Computer, "Unreachable by Ping")
+                    SendEmail $ComputerDescription.Computer "Unreachable by Ping"
                 }
             }            
         }
