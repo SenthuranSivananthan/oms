@@ -15,5 +15,5 @@
     Select-AzureRmSubscription -SubscriptionId $Conn.SubscriptionID
 
     Write-Output("Stopping VM - " + $VMName + " [" + $ResourceGroupName + "]")
-    Stop-AzureRmVM -ResourceGroupName $ResourceGroupName -Name $VMName -Verbose
+    Stop-AzureRmVM -ResourceGroupName $ResourceGroupName -Name $VMName -Verbose -Force
 }
