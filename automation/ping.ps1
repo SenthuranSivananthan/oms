@@ -21,7 +21,7 @@
             $Subject = "VM Status [" + $VMName + "] - " + $Status
 
             $EmailCredentials = New-Object System.Management.Automation.PSCredential(
-                                        $SMTPUser,
+                                        $SMTPUsername,
                                         (ConvertTo-SecureString -String $SMTPPassword -AsPlainText -Force)
                                 )
 
