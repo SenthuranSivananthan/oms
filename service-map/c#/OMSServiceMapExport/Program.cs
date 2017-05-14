@@ -1,10 +1,13 @@
 ﻿using Microsoft.IdentityModel.Clients.ActiveDirectory;
 using Newtonsoft.Json;
 using Newtonsoft.Json.Linq;
+using OMSServiceMapExport.EF;
+using OMSServiceMapExport.Model;
 using OMSServiceMapExport.Model.ServiceMap;
 using System;
 using System.Collections.Generic;
 using System.Configuration;
+using System.Data.Entity.Migrations;
 using System.Net.Http;
 using System.Net.Http.Headers;
 using System.Text;
@@ -32,6 +35,33 @@ namespace OMSServiceMapExport
             var machines = GetMachines(accessToken);
             var serviceMaps = GetServiceMaps(accessToken, machines);
 
+            var dbContext = new ServiceMapDataContext();
+
+            foreach (var serviceMap in serviceMaps)
+            {
+                if (serviceMap.Map == null)
+                {
+                    continue;
+                }
+
+                if (serviceMap.Map.Nodes != null)
+                {
+                    if (serviceMap.Map.Nodes.Machines != null)
+                    {
+                        foreach (var machineDto in serviceMap.Map.Nodes.Machines)
+                        {
+                            var machine = Machine.CreateInstance(machineDto);
+                            if (machine != null)
+                            {
+                                dbContext.Machines.AddOrUpdate(x => x.ServiceMapReferenceKey, machine);
+                                dbContext.SaveChanges();
+                            }
+                        }
+                    }
+                }
+            }
+
+            Console.WriteLine("All Done");
             Console.ReadLine();
         }
 
