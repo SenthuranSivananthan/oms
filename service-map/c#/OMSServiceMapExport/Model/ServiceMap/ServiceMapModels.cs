@@ -1,7 +1,31 @@
-﻿using System.Collections.Generic;
+﻿using Newtonsoft.Json;
+using System.Collections.Generic;
 
 namespace OMSServiceMapExport.Model.ServiceMap
 {
+    #region Machine Model
+    public class MachineValuePropertyDTO
+    {
+        public string ComputerName { get; set; }
+    }
+
+    public class MachineValueDTO
+    {
+        public string Id { get; set; }
+        public string Name { get; set; }
+
+        [JsonProperty("Properties")]
+        public MachineValuePropertyDTO Properties { get; set; }
+    }
+
+    public class MachineRootDTO
+    {
+        [JsonProperty("Value")]
+        public List<MachineValueDTO> Machines { get; set; }
+    }
+    #endregion
+
+    #region Service Map Model
     public class ResourcesDTO
     {
         public int PhysicalMemory { get; set; }
@@ -254,4 +278,5 @@ namespace OMSServiceMapExport.Model.ServiceMap
         public string EndTime { get; set; }
         public MapDTO Map { get; set; }
     }
+    #endregion
 }

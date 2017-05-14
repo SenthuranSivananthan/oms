@@ -9,6 +9,7 @@ using System.Collections.Generic;
 using System.Configuration;
 using System.Data.Entity;
 using System.Data.Entity.Migrations;
+using System.Linq;
 using System.Net.Http;
 using System.Net.Http.Headers;
 using System.Text;
@@ -37,28 +38,29 @@ namespace OMSServiceMapExport
         static void Main(string[] args)
         {
             InitDatabase();
-
-            string accessToken = Login();
-
-            var machines = GetMachines(accessToken);
-            var serviceMaps = GetServiceMaps(accessToken, machines);
-
             var dbContext = new ServiceMapDataContext();
 
-            foreach (var serviceMap in serviceMaps)
+            string accessToken = Login();
+            var machines = GetMachines(accessToken);
+
+            foreach (var machineDTO in machines)
             {
-                if (serviceMap.Map == null)
+                Console.WriteLine($"Generating Service Map - {machineDTO.Properties.ComputerName}");
+
+                var serviceMap = GetServiceMaps(accessToken, machineDTO);
+
+                if (serviceMap == null)
                 {
                     continue;
                 }
 
-                if (serviceMap.Map.Nodes != null)
+                if (serviceMap.Nodes != null)
                 {
                     #region Machines
-                    if (serviceMap.Map.Nodes.Machines != null)
+                    if (serviceMap.Nodes.Machines != null)
                     {
-                        Console.WriteLine("Processing & Saving Machines");
-                        foreach (var machineDto in serviceMap.Map.Nodes.Machines)
+                        Console.WriteLine("\tProcessing & Saving Machines");
+                        foreach (var machineDto in serviceMap.Nodes.Machines)
                         {
                             var machine = Machine.CreateInstance(machineDto);
 
@@ -73,11 +75,11 @@ namespace OMSServiceMapExport
                     #endregion
 
                     #region Processes
-                    if (serviceMap.Map.Nodes.Processes != null)
+                    if (serviceMap.Nodes.Processes != null)
                     {
-                        Console.WriteLine("Processing & Saving Processing");
+                        Console.WriteLine("\tProcessing & Saving Processing");
 
-                        foreach (var processDto in serviceMap.Map.Nodes.Processes)
+                        foreach (var processDto in serviceMap.Nodes.Processes)
                         {
                             var process = MachineProcess.CreateInstance(dbContext, processDto);
 
@@ -92,11 +94,11 @@ namespace OMSServiceMapExport
                     #endregion
 
                     #region Ports
-                    if (serviceMap.Map.Nodes.Ports != null)
+                    if (serviceMap.Nodes.Ports != null)
                     {
-                        Console.WriteLine("Processing & Saving Ports");
+                        Console.WriteLine("\tProcessing & Saving Ports");
 
-                        foreach (var portDto in serviceMap.Map.Nodes.Ports)
+                        foreach (var portDto in serviceMap.Nodes.Ports)
                         {
                             var port = MachinePort.CreateInstance(dbContext, portDto);
 
@@ -111,11 +113,11 @@ namespace OMSServiceMapExport
                     #endregion
 
                     #region Inbound Traffic
-                    if (serviceMap.Map.Edges.Acceptors != null)
+                    if (serviceMap.Edges.Acceptors != null)
                     {
-                        Console.WriteLine("Processing & Saving Inbound Traffic");
+                        Console.WriteLine("\tProcessing & Saving Inbound Traffic");
 
-                        foreach (var inboundDto in serviceMap.Map.Edges.Acceptors)
+                        foreach (var inboundDto in serviceMap.Edges.Acceptors)
                         {
                             var inbound = MachineInboundConnection.CreateInstance(dbContext, inboundDto);
 
@@ -130,11 +132,11 @@ namespace OMSServiceMapExport
                     #endregion
 
                     #region Outbound Traffic
-                    if (serviceMap.Map.Edges.Connections != null)
+                    if (serviceMap.Edges.Connections != null)
                     {
-                        Console.WriteLine("Processing & Saving Outbound Traffic");
+                        Console.WriteLine("\tProcessing & Saving Outbound Traffic");
 
-                        foreach (var outboundDto in serviceMap.Map.Edges.Connections)
+                        foreach (var outboundDto in serviceMap.Edges.Connections)
                         {
                             var outbound = MachineOutboundConnection.CreateInstance(dbContext, outboundDto);
 
@@ -177,7 +179,7 @@ namespace OMSServiceMapExport
             return client;
         }
 
-        static JObject GetMachines(string accessToken)
+        static List<MachineValueDTO> GetMachines(string accessToken)
         {
             Console.WriteLine("Retrieving Machines from Service Map");
 
@@ -191,47 +193,41 @@ namespace OMSServiceMapExport
             {
                 MissingMemberHandling = MissingMemberHandling.Ignore
             };
-            return JsonConvert.DeserializeObject(content.Result, jsonSerializerSettings) as JObject;
+
+            var response = JsonConvert.DeserializeObject<MachineRootDTO>(content.Result, jsonSerializerSettings);
+
+            if (response != null)
+            {
+                return response.Machines.OrderBy(x => x.Properties.ComputerName).ToList();
+            }
+
+            return new List<MachineValueDTO>();
         }
 
-        static List<RootDTO> GetServiceMaps(string accessToken, JObject machines)
+        static MapDTO GetServiceMaps(string accessToken, MachineValueDTO machine)
         {
-            Console.WriteLine("Generating Service Map");
-
             var client = GetServiceMapClient(accessToken);
             var serviceMaps = new List<RootDTO>();
 
-            foreach (var machine in machines)
+            var postContent = new StringContent(
+                    JsonConvert.SerializeObject(new
+                    {
+                        kind = "map:single-machine-dependency",
+                        machineId = machine.Id
+                    }),
+                    Encoding.UTF8,
+                    "application/json");
+
+            var result = client.PostAsync($"generateMap?api-version={SERVICE_MAP_API_VERSION}", postContent);
+            var content = result.Result.Content.ReadAsStringAsync();
+
+            var jsonSerializerSettings = new JsonSerializerSettings
             {
-                if (machine.Value.First == null)
-                {
-                    continue;
-                }
+                MissingMemberHandling = MissingMemberHandling.Ignore
+            };
 
-                Console.WriteLine($"\t{machine.Value.First.SelectToken("properties.computerName").Value<string>()}");
-
-                var machineId = machine.Value.First.SelectToken("id").Value<string>();
-                var postContent = new StringContent(
-                        JsonConvert.SerializeObject(new
-                            {
-                                kind = "map:single-machine-dependency",
-                                machineId = machineId
-                            }),
-                        Encoding.UTF8,
-                        "application/json");
-
-                var result = client.PostAsync($"generateMap?api-version={SERVICE_MAP_API_VERSION}", postContent);
-                var content = result.Result.Content.ReadAsStringAsync();
-
-                var jsonSerializerSettings = new JsonSerializerSettings
-                {
-                    MissingMemberHandling = MissingMemberHandling.Ignore
-                };
-                var response = JsonConvert.DeserializeObject<RootDTO>(content.Result, jsonSerializerSettings);
-                serviceMaps.Add(response);
-            }
-
-            return serviceMaps;
+            var response = JsonConvert.DeserializeObject<RootDTO>(content.Result, jsonSerializerSettings);
+            return response.Map;
         }
     }
 }
