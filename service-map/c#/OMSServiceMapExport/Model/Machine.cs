@@ -21,9 +21,6 @@ namespace OMSServiceMapExport.Model
 
         public virtual List<MachineProcess> Processes { get; set; }
         public virtual List<MachinePort> Ports { get; set; }
-        public virtual List<MachineInboundConnection> MachineInboundConnections { get; set; }
-        public virtual List<MachineInboundConnection> MachineOutboundConnections { get; set; }
-
 
         public static Machine CreateInstance(MachineDTO dto)
         {
