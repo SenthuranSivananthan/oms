@@ -8,6 +8,7 @@ namespace OMSServiceMapExport.Model
 {
     public class Machine
     {
+        [Key]
         public int MachineId { get; set; }
         [Required]
         public string ServiceMapReferenceKey { get; set; }
@@ -18,9 +19,9 @@ namespace OMSServiceMapExport.Model
         public int Memory { get; set; }
         public int Cpus { get; set; }
 
-        public List<MachineProcess> Processes { get; set; }
-        public List<MachinePort> Ports { get; set; }
-        public List<MachineInboundConnection> MachineInboundConnections { get; set; }
+        public virtual List<MachineProcess> Processes { get; set; }
+        public virtual List<MachinePort> Ports { get; set; }
+        public virtual List<MachineInboundConnection> MachineInboundConnections { get; set; }
 
         public static Machine CreateInstance(MachineDTO dto)
         {

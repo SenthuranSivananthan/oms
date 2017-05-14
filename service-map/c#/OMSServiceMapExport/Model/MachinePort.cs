@@ -7,6 +7,7 @@ namespace OMSServiceMapExport.Model
 {
     public class MachinePort
     {
+        [Key]
         public int MachinePortId { get; set; }
 
         public Machine Machine { get; set; }
