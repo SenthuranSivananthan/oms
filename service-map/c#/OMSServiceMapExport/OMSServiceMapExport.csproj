@@ -69,6 +69,7 @@
     <Compile Include="Migrations\Configuration.cs" />
     <Compile Include="Model\Machine.cs" />
     <Compile Include="Model\MachineProcess.cs" />
+    <Compile Include="Model\MachinePort.cs" />
     <Compile Include="Model\ServiceMap\ServiceMapModels.cs" />
     <Compile Include="Program.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />

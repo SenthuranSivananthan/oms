@@ -47,6 +47,7 @@ namespace OMSServiceMapExport
 
                 if (serviceMap.Map.Nodes != null)
                 {
+                    #region Machines
                     if (serviceMap.Map.Nodes.Machines != null)
                     {
                         foreach (var machineDto in serviceMap.Map.Nodes.Machines)
@@ -61,7 +62,9 @@ namespace OMSServiceMapExport
 
                         dbContext.SaveChanges();
                     }
+                    #endregion
 
+                    #region Processes
                     if (serviceMap.Map.Nodes.Processes != null)
                     {
                         foreach (var processDto in serviceMap.Map.Nodes.Processes)
@@ -85,6 +88,33 @@ namespace OMSServiceMapExport
 
                         dbContext.SaveChanges();
                     }
+                    #endregion
+
+                    #region Ports
+                    if (serviceMap.Map.Nodes.Ports != null)
+                    {
+                        foreach (var portDto in serviceMap.Map.Nodes.Ports)
+                        {
+                            var port = MachinePort.CreateInstance(portDto);
+
+                            if (port != null)
+                            {
+                                if (portDto.Properties.Machine != null)
+                                {
+                                    var machine = dbContext.Machines.Where(x => x.ServiceMapReferenceKey != null && x.ServiceMapReferenceKey.Equals(portDto.Properties.Machine.Id)).FirstOrDefault();
+                                    if (machine != null)
+                                    {
+                                        port.MachineId = machine.MachineId;
+                                    }
+                                }
+
+                                dbContext.MachinePorts.AddOrUpdate(x => x.ServiceMapReferenceKey, port);
+                            }
+                        }
+
+                        dbContext.SaveChanges();
+                    }
+                    #endregion
                 }
             }
 
