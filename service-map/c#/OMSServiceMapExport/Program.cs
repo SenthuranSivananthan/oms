@@ -9,7 +9,6 @@ using System.Collections.Generic;
 using System.Configuration;
 using System.Data.Entity;
 using System.Data.Entity.Migrations;
-using System.Linq;
 using System.Net.Http;
 using System.Net.Http.Headers;
 using System.Text;
@@ -58,6 +57,7 @@ namespace OMSServiceMapExport
                     #region Machines
                     if (serviceMap.Map.Nodes.Machines != null)
                     {
+                        Console.WriteLine("Processing & Saving Machines");
                         foreach (var machineDto in serviceMap.Map.Nodes.Machines)
                         {
                             var machine = Machine.CreateInstance(machineDto);
@@ -75,6 +75,8 @@ namespace OMSServiceMapExport
                     #region Processes
                     if (serviceMap.Map.Nodes.Processes != null)
                     {
+                        Console.WriteLine("Processing & Saving Processing");
+
                         foreach (var processDto in serviceMap.Map.Nodes.Processes)
                         {
                             var process = MachineProcess.CreateInstance(dbContext, processDto);
@@ -92,6 +94,8 @@ namespace OMSServiceMapExport
                     #region Ports
                     if (serviceMap.Map.Nodes.Ports != null)
                     {
+                        Console.WriteLine("Processing & Saving Ports");
+
                         foreach (var portDto in serviceMap.Map.Nodes.Ports)
                         {
                             var port = MachinePort.CreateInstance(dbContext, portDto);
@@ -109,6 +113,8 @@ namespace OMSServiceMapExport
                     #region Inbound Traffic
                     if (serviceMap.Map.Edges.Acceptors != null)
                     {
+                        Console.WriteLine("Processing & Saving Inbound Traffic");
+
                         foreach (var inboundDto in serviceMap.Map.Edges.Acceptors)
                         {
                             var inbound = MachineInboundConnection.CreateInstance(dbContext, inboundDto);
@@ -126,6 +132,8 @@ namespace OMSServiceMapExport
                     #region Outbound Traffic
                     if (serviceMap.Map.Edges.Connections != null)
                     {
+                        Console.WriteLine("Processing & Saving Outbound Traffic");
+
                         foreach (var outboundDto in serviceMap.Map.Edges.Connections)
                         {
                             var outbound = MachineOutboundConnection.CreateInstance(dbContext, outboundDto);
@@ -171,6 +179,8 @@ namespace OMSServiceMapExport
 
         static JObject GetMachines(string accessToken)
         {
+            Console.WriteLine("Retrieving Machines from Service Map");
+
             var client = GetServiceMapClient(accessToken);
             client.DefaultRequestHeaders.Accept.Add(new MediaTypeWithQualityHeaderValue("application/json"));
 
@@ -186,6 +196,8 @@ namespace OMSServiceMapExport
 
         static List<RootDTO> GetServiceMaps(string accessToken, JObject machines)
         {
+            Console.WriteLine("Generating Service Map");
+
             var client = GetServiceMapClient(accessToken);
             var serviceMaps = new List<RootDTO>();
 
@@ -195,6 +207,8 @@ namespace OMSServiceMapExport
                 {
                     continue;
                 }
+
+                Console.WriteLine($"\t{machine.Value.First.SelectToken("properties.computerName").Value<string>()}");
 
                 var machineId = machine.Value.First.SelectToken("id").Value<string>();
                 var postContent = new StringContent(
