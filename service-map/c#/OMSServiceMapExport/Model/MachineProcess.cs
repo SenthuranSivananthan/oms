@@ -5,7 +5,7 @@ namespace OMSServiceMapExport.Model
 {
     public class MachineProcess
     {
-        public int Id { get; set; }
+        public int MachineProcessId { get; set; }
 
         public Machine Machine { get; set; }
         public int MachineId { get; set; }
