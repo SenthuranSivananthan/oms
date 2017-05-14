@@ -61,7 +61,7 @@ namespace OMSServiceMapExport.Model.ServiceMap
     public class MachineDTO
     {
         public string Kind { get; set; }
-        public MachinePropertyDTO properties { get; set; }
+        public MachinePropertyDTO Properties { get; set; }
         public string Id { get; set; }
         public string Type { get; set; }
         public string Name { get; set; }
@@ -137,11 +137,11 @@ namespace OMSServiceMapExport.Model.ServiceMap
 
     public class ConnectionSourceDTO
     {
-        public string kind { get; set; }
-        public ConnectionSourcePropertyDTO properties { get; set; }
-        public string id { get; set; }
-        public string type { get; set; }
-        public string name { get; set; }
+        public string Kind { get; set; }
+        public ConnectionSourcePropertyDTO Properties { get; set; }
+        public string Id { get; set; }
+        public string Type { get; set; }
+        public string Name { get; set; }
     }
 
     public class ConnectionDestinationPropertyDTO
@@ -167,16 +167,16 @@ namespace OMSServiceMapExport.Model.ServiceMap
 
     public class ConnectionServerPortDTO
     {
-        public string kind { get; set; }
-        public ConnectionServerPortPropertyDTO properties { get; set; }
-        public string id { get; set; }
-        public string type { get; set; }
-        public string name { get; set; }
+        public string Kind { get; set; }
+        public ConnectionServerPortPropertyDTO Properties { get; set; }
+        public string Id { get; set; }
+        public string Type { get; set; }
+        public string Name { get; set; }
     }
 
     public class ConnectionPropertyDTO
     {
-        public ConnectionSourceDTO source { get; set; }
+        public ConnectionSourceDTO Source { get; set; }
         public ConnectionDestinationDTO Destination { get; set; }
         public ConnectionServerPortDTO ServerPort { get; set; }
         public string FailureState { get; set; }
@@ -185,7 +185,7 @@ namespace OMSServiceMapExport.Model.ServiceMap
     public class ConnectionDTO
     {
         public string Kind { get; set; }
-        public ConnectionPropertyDTO properties { get; set; }
+        public ConnectionPropertyDTO Properties { get; set; }
         public string Id { get; set; }
         public string Type { get; set; }
         public string Name { get; set; }
@@ -201,7 +201,7 @@ namespace OMSServiceMapExport.Model.ServiceMap
     public class AcceptorSourceDTO
     {
         public string Kind { get; set; }
-        public AcceptorSourcePropertyDTO properties { get; set; }
+        public AcceptorSourcePropertyDTO Properties { get; set; }
         public string Id { get; set; }
         public string Type { get; set; }
         public string Name { get; set; }
@@ -215,7 +215,7 @@ namespace OMSServiceMapExport.Model.ServiceMap
     public class AcceptorDestinationDTO
     {
         public string Kind { get; set; }
-        public AcceptorDestinationPropertyDTO properties { get; set; }
+        public AcceptorDestinationPropertyDTO Properties { get; set; }
         public string Id { get; set; }
         public string Type { get; set; }
         public string Name { get; set; }
