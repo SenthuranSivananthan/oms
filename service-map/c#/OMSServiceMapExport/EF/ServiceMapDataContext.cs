@@ -13,5 +13,6 @@ namespace OMSServiceMapExport.EF
         public DbSet<Machine> Machines { get; set; }
         public DbSet<MachineProcess> MachineProcesses { get; set; }
         public DbSet<MachinePort> MachinePorts { get; set; }
+        public DbSet<MachineInboundConnection> MachineInboundConnections { get; set; }
     }
 }

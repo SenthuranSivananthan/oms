@@ -7,6 +7,7 @@ using OMSServiceMapExport.Model.ServiceMap;
 using System;
 using System.Collections.Generic;
 using System.Configuration;
+using System.Data.Entity;
 using System.Data.Entity.Migrations;
 using System.Linq;
 using System.Net.Http;
@@ -29,8 +30,15 @@ namespace OMSServiceMapExport
         static string OMS_WORKSPACE_RESOURCE_GROUP = ConfigurationManager.AppSettings["OMSWorkspaceResourceGroup"];
         static string OMS_WORKSPACE_NAME = ConfigurationManager.AppSettings["OMSWorkspaceName"];
 
+        static void InitDatabase()
+        {
+            Database.SetInitializer(new MigrateDatabaseToLatestVersion<ServiceMapDataContext, Migrations.Configuration>());
+        }
+
         static void Main(string[] args)
         {
+            InitDatabase();
+
             string accessToken = Login();
 
             var machines = GetMachines(accessToken);
@@ -91,6 +99,23 @@ namespace OMSServiceMapExport
                             if (port != null)
                             {
                                 dbContext.MachinePorts.AddOrUpdate(x => x.ServiceMapReferenceKey, port);
+                            }
+                        }
+
+                        dbContext.SaveChanges();
+                    }
+                    #endregion
+
+                    #region Inbound Traffic
+                    if (serviceMap.Map.Edges.Acceptors != null)
+                    {
+                        foreach (var inboundDto in serviceMap.Map.Edges.Acceptors)
+                        {
+                            var inbound = MachineInboundConnection.CreateInstance(dbContext, inboundDto);
+
+                            if (inbound != null)
+                            {
+                                dbContext.MachineInboundConnections.AddOrUpdate(x => x.ServiceMapReferenceKey, inbound);
                             }
                         }
 

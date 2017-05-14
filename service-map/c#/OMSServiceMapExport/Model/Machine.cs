@@ -20,6 +20,7 @@ namespace OMSServiceMapExport.Model
 
         public List<MachineProcess> Processes { get; set; }
         public List<MachinePort> Ports { get; set; }
+        public List<MachineInboundConnection> MachineInboundConnections { get; set; }
 
         public static Machine CreateInstance(MachineDTO dto)
         {
