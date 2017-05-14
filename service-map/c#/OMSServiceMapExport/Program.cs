@@ -17,7 +17,7 @@ namespace OMSServiceMapExport
 
         static string TENANT_ID = ConfigurationManager.AppSettings["AADTenantId"];
         static string CLIENT_ID = ConfigurationManager.AppSettings["AADClientId"];
-        static string CLIENT_SECRET = ConfigurationManager.AppSettings["AADClientSecret;
+        static string CLIENT_SECRET = ConfigurationManager.AppSettings["AADClientSecret"];
 
         static string MANAGEMENT_URL_REST = "https://management.azure.com";
         static string SERVICE_MAP_API_VERSION = "2015-11-01-preview";
