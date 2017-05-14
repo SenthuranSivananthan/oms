@@ -14,11 +14,22 @@ namespace OMSServiceMapExport.EF
         public DbSet<MachineProcess> MachineProcesses { get; set; }
         public DbSet<MachinePort> MachinePorts { get; set; }
         public DbSet<MachineInboundConnection> MachineInboundConnections { get; set; }
+        public DbSet<MachineOutboundConnection> MachineOutboundConnections { get; set; }
 
         protected override void OnModelCreating(DbModelBuilder modelBuilder)
         {
             modelBuilder.Entity<MachineInboundConnection>()
-               .HasRequired(f => f.Machine)
+               .HasRequired(f => f.SourceMachine)
+               .WithMany()
+               .WillCascadeOnDelete(false);
+
+            modelBuilder.Entity<MachineOutboundConnection>()
+               .HasRequired(f => f.DestinationMachine)
+               .WithMany()
+               .WillCascadeOnDelete(false);
+
+            modelBuilder.Entity<MachineOutboundConnection>()
+               .HasRequired(f => f.ServerPort)
                .WithMany()
                .WillCascadeOnDelete(false);
         }

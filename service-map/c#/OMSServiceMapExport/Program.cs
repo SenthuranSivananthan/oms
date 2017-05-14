@@ -122,6 +122,23 @@ namespace OMSServiceMapExport
                         dbContext.SaveChanges();
                     }
                     #endregion
+
+                    #region Outbound Traffic
+                    if (serviceMap.Map.Edges.Connections != null)
+                    {
+                        foreach (var outboundDto in serviceMap.Map.Edges.Connections)
+                        {
+                            var outbound = MachineOutboundConnection.CreateInstance(dbContext, outboundDto);
+
+                            if (outbound != null)
+                            {
+                                dbContext.MachineOutboundConnections.AddOrUpdate(x => x.ServiceMapReferenceKey, outbound);
+                            }
+                        }
+
+                        dbContext.SaveChanges();
+                    }
+                    #endregion
                 }
             }
 
