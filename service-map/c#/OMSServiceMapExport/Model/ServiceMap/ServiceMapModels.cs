@@ -36,7 +36,7 @@ namespace OMSServiceMapExport.Model.ServiceMap
         public string FullName { get; set; }
     }
 
-    public class VirtualMachineDRO
+    public class VirtualMachineDTO
     {
         public string VirtualMachineType { get; set; }
         public string NativeMachineId { get; set; }
@@ -55,7 +55,7 @@ namespace OMSServiceMapExport.Model.ServiceMap
         public ResourcesDTO Resources { get; set; }
         public NetworkingDTO Networking { get; set; }
         public OperatingSystemDTO OperatingSystem { get; set; }
-        public VirtualMachineDRO VirtualMachine { get; set; }
+        public VirtualMachineDTO VirtualMachine { get; set; }
     }
 
     public class MachineDTO
