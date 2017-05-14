@@ -8,6 +8,7 @@ using System;
 using System.Collections.Generic;
 using System.Configuration;
 using System.Data.Entity.Migrations;
+using System.Linq;
 using System.Net.Http;
 using System.Net.Http.Headers;
 using System.Text;
@@ -51,12 +52,38 @@ namespace OMSServiceMapExport
                         foreach (var machineDto in serviceMap.Map.Nodes.Machines)
                         {
                             var machine = Machine.CreateInstance(machineDto);
+
                             if (machine != null)
                             {
                                 dbContext.Machines.AddOrUpdate(x => x.ServiceMapReferenceKey, machine);
-                                dbContext.SaveChanges();
                             }
                         }
+
+                        dbContext.SaveChanges();
+                    }
+
+                    if (serviceMap.Map.Nodes.Processes != null)
+                    {
+                        foreach (var processDto in serviceMap.Map.Nodes.Processes)
+                        {
+                            var process = MachineProcess.CreateInstance(processDto);
+
+                            if (process != null)
+                            {
+                                if (processDto.Properties.Machine != null)
+                                {
+                                    var machine = dbContext.Machines.Where(x => x.ServiceMapReferenceKey != null && x.ServiceMapReferenceKey.Equals(processDto.Properties.Machine.Id)).FirstOrDefault();
+                                    if (machine != null)
+                                    {
+                                        process.MachineId = machine.MachineId;
+                                    }
+                                }
+
+                                dbContext.MachineProcesses.AddOrUpdate(x => x.ServiceMapReferenceKey, process);
+                            }
+                        }
+
+                        dbContext.SaveChanges();
                     }
                 }
             }

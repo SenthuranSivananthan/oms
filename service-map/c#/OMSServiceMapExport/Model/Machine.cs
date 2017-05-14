@@ -1,4 +1,5 @@
 ﻿using OMSServiceMapExport.Model.ServiceMap;
+using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
 
 namespace OMSServiceMapExport.Model
@@ -14,6 +15,8 @@ namespace OMSServiceMapExport.Model
         public string OperatingSystem { get; set; }
         public int Memory { get; set; }
         public int Cpus { get; set; }
+
+        public List<MachineProcess> Processes { get; set; }
 
         public static Machine CreateInstance(MachineDTO dto)
         {
