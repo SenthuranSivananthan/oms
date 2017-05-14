@@ -69,19 +69,10 @@ namespace OMSServiceMapExport
                     {
                         foreach (var processDto in serviceMap.Map.Nodes.Processes)
                         {
-                            var process = MachineProcess.CreateInstance(processDto);
+                            var process = MachineProcess.CreateInstance(dbContext, processDto);
 
                             if (process != null)
                             {
-                                if (processDto.Properties.Machine != null)
-                                {
-                                    var machine = dbContext.Machines.Where(x => x.ServiceMapReferenceKey != null && x.ServiceMapReferenceKey.Equals(processDto.Properties.Machine.Id)).FirstOrDefault();
-                                    if (machine != null)
-                                    {
-                                        process.MachineId = machine.MachineId;
-                                    }
-                                }
-
                                 dbContext.MachineProcesses.AddOrUpdate(x => x.ServiceMapReferenceKey, process);
                             }
                         }
@@ -95,19 +86,10 @@ namespace OMSServiceMapExport
                     {
                         foreach (var portDto in serviceMap.Map.Nodes.Ports)
                         {
-                            var port = MachinePort.CreateInstance(portDto);
+                            var port = MachinePort.CreateInstance(dbContext, portDto);
 
                             if (port != null)
                             {
-                                if (portDto.Properties.Machine != null)
-                                {
-                                    var machine = dbContext.Machines.Where(x => x.ServiceMapReferenceKey != null && x.ServiceMapReferenceKey.Equals(portDto.Properties.Machine.Id)).FirstOrDefault();
-                                    if (machine != null)
-                                    {
-                                        port.MachineId = machine.MachineId;
-                                    }
-                                }
-
                                 dbContext.MachinePorts.AddOrUpdate(x => x.ServiceMapReferenceKey, port);
                             }
                         }

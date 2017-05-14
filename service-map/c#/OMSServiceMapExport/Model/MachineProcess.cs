@@ -1,5 +1,7 @@
-﻿using OMSServiceMapExport.Model.ServiceMap;
+﻿using OMSServiceMapExport.EF;
+using OMSServiceMapExport.Model.ServiceMap;
 using System.ComponentModel.DataAnnotations;
+using System.Linq;
 
 namespace OMSServiceMapExport.Model
 {
@@ -24,7 +26,7 @@ namespace OMSServiceMapExport.Model
         public string ExecutablePath { get; set; }
         public string WorkingDirectory { get; set; }
 
-        public static MachineProcess CreateInstance(ProcessDTO dto)
+        public static MachineProcess CreateInstance(ServiceMapDataContext dbContext, ProcessDTO dto)
         {
             if (dto == null)
             {
@@ -38,6 +40,15 @@ namespace OMSServiceMapExport.Model
 
             if (dto.Properties != null)
             {
+                if (dto.Properties.Machine != null)
+                {
+                    var machine = dbContext.Machines.Where(x => x.ServiceMapReferenceKey != null && x.ServiceMapReferenceKey.Equals(dto.Properties.Machine.Id)).FirstOrDefault();
+                    if (machine != null)
+                    {
+                        process.MachineId = machine.MachineId;
+                    }
+                }
+
                 process.State = dto.Properties.MonitoringState;
                 process.DisplayName = dto.Properties.DisplayName;
 
