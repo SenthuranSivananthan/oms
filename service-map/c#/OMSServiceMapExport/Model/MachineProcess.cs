@@ -11,9 +11,11 @@ namespace OMSServiceMapExport.Model
         public int MachineId { get; set; }
 
         [Required]
-        public string ServiceMapReferenceKey {get; set;}
+        public string ServiceMapReferenceKey { get; set; }
+        public string State { get; set; }
 
         public string CompanyName { get; set; }
+        public string DisplayName { get; set; }
         public string InternalName { get; set; }
         public string ProductName { get; set; }
         public string ProductVersion { get; set; }
@@ -34,16 +36,22 @@ namespace OMSServiceMapExport.Model
                 ServiceMapReferenceKey = dto.Id
             };
 
-            if (dto.Properties != null && dto.Properties.Details != null)
+            if (dto.Properties != null)
             {
-                process.CommandLine = dto.Properties.Details.CommandLine;
-                process.CompanyName = dto.Properties.Details.CommandLine;
-                process.ExecutablePath = dto.Properties.Details.ExecutablePath;
-                process.FileVersion = dto.Properties.Details.FileVersion;
-                process.InternalName = dto.Properties.Details.InternalName;
-                process.ProductName = dto.Properties.Details.ProductName;
-                process.ProductVersion = dto.Properties.Details.ProductVersion;
-                process.WorkingDirectory = dto.Properties.Details.WorkingDirectory;
+                process.State = dto.Properties.MonitoringState;
+                process.DisplayName = dto.Properties.DisplayName;
+
+                if (dto.Properties.Details != null)
+                {
+                    process.CommandLine = dto.Properties.Details.CommandLine;
+                    process.CompanyName = dto.Properties.Details.CommandLine;
+                    process.ExecutablePath = dto.Properties.Details.ExecutablePath;
+                    process.FileVersion = dto.Properties.Details.FileVersion;
+                    process.InternalName = dto.Properties.Details.InternalName;
+                    process.ProductName = dto.Properties.Details.ProductName;
+                    process.ProductVersion = dto.Properties.Details.ProductVersion;
+                    process.WorkingDirectory = dto.Properties.Details.WorkingDirectory;
+                }
             }
 
             return process;
