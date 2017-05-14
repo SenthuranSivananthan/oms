@@ -1,10 +1,10 @@
 ﻿using Microsoft.IdentityModel.Clients.ActiveDirectory;
 using Newtonsoft.Json;
 using Newtonsoft.Json.Linq;
+using OMSServiceMapExport.Model.ServiceMap;
 using System;
 using System.Collections.Generic;
 using System.Configuration;
-using System.Linq;
 using System.Net.Http;
 using System.Net.Http.Headers;
 using System.Text;
@@ -28,10 +28,9 @@ namespace OMSServiceMapExport
         static void Main(string[] args)
         {
             string accessToken = Login();
-            JObject machines = GetMachines(accessToken);
 
-            GetProcesses(accessToken, machines);
-            List<JObject> serviceMaps = GetServiceMaps(accessToken, machines);
+            var machines = GetMachines(accessToken);
+            var serviceMaps = GetServiceMaps(accessToken, machines);
 
             Console.ReadLine();
         }
@@ -66,33 +65,18 @@ namespace OMSServiceMapExport
 
             var result = client.GetAsync($"machines?api-version={SERVICE_MAP_API_VERSION}");
             var content = result.Result.Content.ReadAsStringAsync();
-            var machines = JsonConvert.DeserializeObject(content.Result) as JObject;
-            
-            return machines;
-        }
 
-        static void GetProcesses(string accessToken, JObject machines)
-        {
-            var client = GetServiceMapClient(accessToken);
-
-            foreach (var machine in machines)
+            var jsonSerializerSettings = new JsonSerializerSettings
             {
-                if (machine.Value.First == null)
-                {
-                    continue;
-                }
-
-                var machineId = machine.Value.First.SelectToken("id").Value<string>().Split('/').Last();
-                var result = client.GetAsync($"machines/{machineId}/processes?api-version={SERVICE_MAP_API_VERSION}");
-                var content = result.Result.Content.ReadAsStringAsync();
-                Console.WriteLine(content);
-            }
+                MissingMemberHandling = MissingMemberHandling.Ignore
+            };
+            return JsonConvert.DeserializeObject(content.Result, jsonSerializerSettings) as JObject;
         }
 
-        static List<JObject> GetServiceMaps(string accessToken, JObject machines)
+        static List<RootDTO> GetServiceMaps(string accessToken, JObject machines)
         {
             var client = GetServiceMapClient(accessToken);
-            var serviceMaps = new List<JObject>();
+            var serviceMaps = new List<RootDTO>();
 
             foreach (var machine in machines)
             {
@@ -102,7 +86,6 @@ namespace OMSServiceMapExport
                 }
 
                 var machineId = machine.Value.First.SelectToken("id").Value<string>();
-
                 var postContent = new StringContent(
                         JsonConvert.SerializeObject(new
                             {
@@ -115,7 +98,12 @@ namespace OMSServiceMapExport
                 var result = client.PostAsync($"generateMap?api-version={SERVICE_MAP_API_VERSION}", postContent);
                 var content = result.Result.Content.ReadAsStringAsync();
 
-                serviceMaps.Add(JsonConvert.DeserializeObject(content.Result) as JObject);
+                var jsonSerializerSettings = new JsonSerializerSettings
+                {
+                    MissingMemberHandling = MissingMemberHandling.Ignore
+                };
+                var response = JsonConvert.DeserializeObject<RootDTO>(content.Result, jsonSerializerSettings);
+                serviceMaps.Add(response);
             }
 
             return serviceMaps;
